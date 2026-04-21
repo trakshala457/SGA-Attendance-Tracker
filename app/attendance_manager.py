@@ -74,7 +74,7 @@ def load_students() -> list[Student]:
 
 
 def save_students(students: Iterable[Student]) -> None:
-    _ensure_data_file()
+    os.makedirs(DATA_DIR, exist_ok=True)
     fieldnames = ["student_id", "name", "student_email", "parent_email", "attendance_log"]
     with open(CSV_PATH, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
