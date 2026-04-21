@@ -1,0 +1,101 @@
+## Project: SGA Attendance Tracker with Weekly Smart Email Reports
+
+### Context
+GR University has 10,000 students, 50 SGAs (1:200 ratio). SGAs currently track attendance manually via spreadsheets and send weekly WhatsApp reports to parents. This is inefficient and error-prone.
+
+### Problem to solve
+Build a **web app for SGAs** to:
+- Mark daily attendance (Mon–Sat) for **all assigned students** in one place.
+- Automatically calculate each student's average attendance.
+- On Sunday, send a **personalized AI-generated email** to both **student and parent** with weekly summary and tone-based message (alert/warning/appreciation) using Gemini API.
+
+### Who uses the app
+- **SGA** (single user for demo – we simulate one SGA with 5–10 dummy students).  
+- No student login required. SGA is responsible for marking attendance.
+
+### Tech Stack (explicit)
+- **UI & Backend**: Streamlit (Python)
+- **LLM**: Google Gemini API (`gemini-1.5-flash`)
+- **Data storage**: CSV or SQLite (persist student data and daily attendance records)
+- **Environment**: `.env` with `GEMINI_API_KEY`
+- **Email**: `smtplib` (or log to console with working SMTP code commented)
+
+### Functional Requirements
+
+#### 1. Student Data Model (stored in CSV/DB)
+Each student has:
+- `student_id`
+- `name`
+- `student_email`
+- `parent_email`
+- `attendance_log`: dictionary mapping date (YYYY-MM-DD) to "Present" or "Absent" (only weekdays Mon–Sat).
+- `average_attendance` (calculated as % of present days out of total marked days in current week)
+
+#### 2. SGA Dashboard (main page)
+- Display a table of all assigned students (5–10 dummy students).
+- Columns: Name, ID, Student Email, Parent Email, Current Avg Attendance (%), **Today's Attendance** (dropdown or checkbox: Present/Absent).
+- SGA can mark today's attendance for **each student** in one row.
+- A **"Save Today's Attendance"** button submits all changes at once.
+- After saving, recalculate averages and update the table instantly.
+- If today is Sunday, show a message: "No attendance marking today – weekly report will be sent."
+
+#### 3. Weekly Email Automation (Sunday or manual trigger)
+- On Sunday (or via a manual "Send Weekly Reports" button), the app:
+  - For each student, compute:
+    - Days attended this week (Mon–Sat)
+    - Days missed
+    - Average %
+  - Call Gemini API with a prompt that generates a personalized email body (tone based on %).
+  - Send email to `student_email` and `parent_email` (cc both or separate – your choice).
+  - Log all emails in a Streamlit expander or sidebar.
+- Provide a **"Test Weekly Report (Send Now)"** button to bypass day check.
+
+#### 4. Flag Low Attendance
+- Highlight rows where average < 75% (red background or warning icon).
+- Add a filter to show only low-attendance students.
+
+### File Structure (required)
+project/
+├── .env
+├── requirements.txt
+├── main.py # Streamlit app, UI, session state
+├── attendance_manager.py # Load/save students, mark attendance, calculate averages
+├── gemini_service.py # Gemini API – generate email content
+├── email_sender.py # SMTP or mock email sender
+├── utils.py # Date helpers (weekdays, Sunday check)
+└── data/
+└── students.csv # Persistent student records
+
+text
+
+### Assumptions (document in code)
+- The SGA is already authenticated (no login screen for demo).
+- Attendance is marked per student for the **current day only** (but the UI can be extended to past days if needed).
+- The app runs on a server where Sunday can be detected; otherwise manual trigger exists.
+- Email SMTP credentials can be placeholders; printing email content to console is acceptable, but full SMTP code must be present (commented out) with instructions.
+
+### Example Gemini Prompt (for email generation)
+```python
+prompt = f"""
+You are an SGA assistant at GR University. Write a short, professional email to both the student and their parent.
+
+Student: {name}
+Weekly attendance: {attendance_percent}% (out of 6 days, attended {days_attended}, missed {days_missed})
+
+Category:
+- Below 50%: ALERT – urgent, serious tone, suggest meeting with SGA.
+- 51-74%: WARNING – concerned but encouraging.
+- 75% and above: APPRECIATION – proud, maintain good work.
+
+Write only the email body (no subject). Keep it warm, specific, and actionable.
+"""
+Deliverable
+Complete, runnable code for all files.
+
+Instructions to set up virtual environment, install dependencies, add Gemini API key, and run streamlit run main.py.
+
+Dummy data preloaded with 5 students covering low, medium, and high attendance ranges.
+
+Error handling for API failures.
+
+Now generate the full implementation.
