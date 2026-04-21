@@ -67,13 +67,28 @@ def render_dashboard() -> None:
     elif not is_weekday_mon_sat(today):
         st.warning("Today is not a weekday (Mon-Sat). Marking is disabled.")
 
-    show_only_low = st.checkbox("Show only low-attendance students (< 75%)", value=False)
+    fcols = st.columns([3, 2, 2])
+    search = fcols[0].text_input("Search by name or ID", "").strip().lower()
+    show_only_low = fcols[1].checkbox("Only low attendance (< 75%)", value=False)
+    page_size = fcols[2].selectbox("Rows per page", [25, 50, 100, 200], index=0)
 
-    visible = [s for s in students if (not show_only_low) or s.average_attendance() < 75]
+    filtered = [
+        s for s in students
+        if ((not show_only_low) or s.average_attendance() < 75)
+        and (not search or search in s.name.lower() or search in s.student_id.lower())
+    ]
 
-    if not visible:
+    if not filtered:
         st.success("No students match the current filter.")
         return
+
+    total_pages = max(1, (len(filtered) + page_size - 1) // page_size)
+    page = st.number_input(
+        f"Page (1 - {total_pages}) — showing {len(filtered)} of {len(students)}",
+        min_value=1, max_value=total_pages, value=1, step=1,
+    )
+    start = (page - 1) * page_size
+    visible = filtered[start:start + page_size]
 
     with st.form("attendance_form"):
         rows = []

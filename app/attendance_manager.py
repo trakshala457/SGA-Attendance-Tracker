@@ -99,47 +99,63 @@ def mark_today_attendance(students: list[Student], updates: dict[str, str], targ
 
 
 def seed_default_students() -> None:
-    """Pre-load 5 dummy students with a mix of low/medium/high attendance for current week."""
+    """Pre-load 200 dummy students with a mix of low/medium/high attendance for current week.
+    S001 is Trakshala with real emails; the rest are dummy."""
     from datetime import date as _d
+    import random
 
+    rng = random.Random(42)
     week = current_week_dates(_d.today())
-    # We seed days *before today* with varied data so averages display nicely.
     today = _d.today()
     past_days = [d for d in week if d < today]
 
-    def make_log(pattern: list[str]) -> dict[str, str]:
-        # pattern aligned to past_days length; pad with ABSENT if shorter
+    def make_log(target_pct: float) -> dict[str, str]:
         log = {}
-        for i, d in enumerate(past_days):
-            log[fmt(d)] = pattern[i] if i < len(pattern) else ABSENT
+        for d in past_days:
+            log[fmt(d)] = PRESENT if rng.random() < target_pct else ABSENT
         return log
 
-    seeds = [
+    first_names = [
+        "Aarav", "Priya", "Rohan", "Ananya", "Kabir", "Diya", "Vivaan", "Isha",
+        "Arjun", "Sara", "Reyansh", "Kavya", "Aditya", "Meera", "Krishna", "Tara",
+        "Yash", "Nisha", "Dev", "Riya", "Karan", "Pooja", "Manav", "Sneha",
+        "Aryan", "Aanya", "Ishaan", "Myra", "Vihaan", "Anika", "Rudra", "Aadhya",
+        "Shaurya", "Avni", "Kabeer", "Pari", "Atharv", "Ira", "Veer", "Siya",
+    ]
+    last_names = [
+        "Sharma", "Reddy", "Verma", "Iyer", "Singh", "Patel", "Kumar", "Gupta",
+        "Mehta", "Rao", "Nair", "Joshi", "Bose", "Mishra", "Pillai", "Chopra",
+        "Das", "Khan", "Malhotra", "Naidu", "Shetty", "Yadav", "Kulkarni", "Banerjee",
+    ]
+
+    seeds: list[Student] = [
         Student(
-            "S001", "Aarav Sharma",
-            "aarav@example.edu", "parent.aarav@example.com",
-            make_log([PRESENT] * 6),  # high
-        ),
-        Student(
-            "S002", "Priya Reddy",
-            "priya@example.edu", "parent.priya@example.com",
-            make_log([PRESENT, PRESENT, ABSENT, PRESENT, PRESENT, PRESENT]),  # high
-        ),
-        Student(
-            "S003", "Rohan Verma",
-            "rohan@example.edu", "parent.rohan@example.com",
-            make_log([PRESENT, ABSENT, PRESENT, ABSENT, PRESENT, ABSENT]),  # medium ~50%
-        ),
-        Student(
-            "S004", "Ananya Iyer",
-            "ananya@example.edu", "parent.ananya@example.com",
-            make_log([ABSENT, ABSENT, PRESENT, ABSENT, ABSENT, PRESENT]),  # low ~33%
-        ),
-        Student(
-            "S005", "Kabir Singh",
-            "kabir@example.edu", "parent.kabir@example.com",
-            make_log([ABSENT, ABSENT, ABSENT, PRESENT, ABSENT, ABSENT]),  # very low
+            "S001", "Trakshala",
+            "trakshalatudgani@gmail.com", "tudganisatish@gmail.com",
+            make_log(0.9),
         ),
     ]
+
+    for i in range(2, 201):
+        sid = f"S{i:03d}"
+        name = f"{rng.choice(first_names)} {rng.choice(last_names)}"
+        slug = name.lower().replace(" ", ".")
+        # Mix attendance: ~25% low, ~25% medium, ~50% high
+        roll = rng.random()
+        if roll < 0.25:
+            target = rng.uniform(0.20, 0.49)
+        elif roll < 0.50:
+            target = rng.uniform(0.55, 0.74)
+        else:
+            target = rng.uniform(0.78, 1.0)
+        seeds.append(
+            Student(
+                sid, name,
+                f"{slug}{i}@example.edu",
+                f"parent.{slug}{i}@example.com",
+                make_log(target),
+            )
+        )
+
     os.makedirs(DATA_DIR, exist_ok=True)
     save_students(seeds)
