@@ -73,7 +73,9 @@ def auto_generate_for_students(students, today: date | None = None) -> list[Foll
     due_str = fmt(_friday_of(week[0]))
 
     tasks = _load_all()
-    existing_keys = {(t.student_id, t.week_start) for t in tasks if t.status == "open"}
+    # Skip if a task already exists for this student & week in ANY status,
+    # so completing a task doesn't immediately recreate it.
+    existing_keys = {(t.student_id, t.week_start) for t in tasks}
     new: list[FollowUpTask] = []
 
     for s in students:
