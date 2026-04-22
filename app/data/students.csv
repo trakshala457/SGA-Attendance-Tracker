@@ -1,5 +1,5 @@
 student_id,name,student_email,parent_email,attendance_log
-S001,Trakshala,trakshalatudgani@gmail.com,tudganisatish@gmail.com,"{""2026-04-20"": ""Present"", ""2026-04-21"": ""Absent""}"
+S001,Trakshala,tudganitrakshala@gmail.com,tudganisatish@gmail.com,"{""2026-04-20"": ""Present"", ""2026-04-21"": ""Absent""}"
 S002,Priya Banerjee,priya.banerjee2@example.edu,parent.priya.banerjee2@example.com,"{""2026-04-20"": ""Absent"", ""2026-04-21"": ""Present""}"
 S003,Kabeer Verma,kabeer.verma3@example.edu,parent.kabeer.verma3@example.com,"{""2026-04-20"": ""Present"", ""2026-04-21"": ""Present""}"
 S004,Krishna Das,krishna.das4@example.edu,parent.krishna.das4@example.com,"{""2026-04-20"": ""Present"", ""2026-04-21"": ""Present""}"

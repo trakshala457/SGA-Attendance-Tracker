@@ -17,9 +17,12 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
-# import smtplib
-# from email.mime.text import MIMEText
-# from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
+load_dotenv() 
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 USE_SMTP = os.environ.get("SGA_USE_SMTP", "0") == "1"
 
@@ -61,22 +64,22 @@ def send_weekly_email(
 
 def _send_via_smtp(recipients: list[str], subject: str, body: str) -> None:
     """Real SMTP delivery. Uncomment to enable."""
-    raise NotImplementedError(
-        "SMTP delivery not enabled. Configure env vars and uncomment the body of _send_via_smtp."
-    )
-    # host = os.environ["SMTP_HOST"]
-    # port = int(os.environ.get("SMTP_PORT", "587"))
-    # user = os.environ["SMTP_USER"]
-    # password = os.environ["SMTP_PASSWORD"]
-    # sender = os.environ.get("SMTP_FROM", user)
-    #
-    # msg = MIMEMultipart("alternative")
-    # msg["Subject"] = subject
-    # msg["From"] = sender
-    # msg["To"] = ", ".join(recipients)
-    # msg.attach(MIMEText(body, "plain"))
-    #
-    # with smtplib.SMTP(host, port) as server:
-    #     server.starttls()
-    #     server.login(user, password)
-    #     server.sendmail(sender, recipients, msg.as_string())
+    # raise NotImplementedError(
+    #     "SMTP delivery not enabled. Configure env vars and uncomment the body of _send_via_smtp."
+    # )
+    host = os.environ["SMTP_HOST"]
+    port = int(os.environ.get("SMTP_PORT", "587"))
+    user = os.environ["SMTP_USER"]
+    password = os.environ["SMTP_PASSWORD"]
+    sender = os.environ.get("SMTP_FROM", user)
+    
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = ", ".join(recipients)
+    msg.attach(MIMEText(body, "plain"))
+    
+    with smtplib.SMTP(host, port) as server:
+        server.starttls()
+        server.login(user, password)
+        server.sendmail(sender, recipients, msg.as_string())
