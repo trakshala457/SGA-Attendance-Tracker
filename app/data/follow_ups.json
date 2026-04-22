@@ -8,7 +8,7 @@
     "due_date": "2026-04-24",
     "attendance_percent": 0.0,
     "action": "Call parent.aadhya.shetty101@example.com by Friday (2026-04-24) - Aadhya Shetty's attendance dropped to 0.0%.",
-    "status": "open",
+    "status": "done",
     "created_at": "2026-04-22"
   },
   {
@@ -308,6 +308,30 @@
     "due_date": "2026-04-24",
     "attendance_percent": 0.0,
     "action": "Call parent.rudra.iyer199@example.com by Friday (2026-04-24) - Rudra Iyer's attendance dropped to 0.0%.",
+    "status": "open",
+    "created_at": "2026-04-22"
+  },
+  {
+    "task_id": "FU-S101-2026-04-20",
+    "student_id": "S101",
+    "student_name": "Aadhya Shetty",
+    "parent_email": "parent.aadhya.shetty101@example.com",
+    "week_start": "2026-04-20",
+    "due_date": "2026-04-24",
+    "attendance_percent": 0.0,
+    "action": "Call parent.aadhya.shetty101@example.com by Friday (2026-04-24) - Aadhya Shetty's attendance dropped to 0.0%.",
+    "status": "done",
+    "created_at": "2026-04-22"
+  },
+  {
+    "task_id": "FU-S101-2026-04-20",
+    "student_id": "S101",
+    "student_name": "Aadhya Shetty",
+    "parent_email": "parent.aadhya.shetty101@example.com",
+    "week_start": "2026-04-20",
+    "due_date": "2026-04-24",
+    "attendance_percent": 0.0,
+    "action": "Call parent.aadhya.shetty101@example.com by Friday (2026-04-24) - Aadhya Shetty's attendance dropped to 0.0%.",
     "status": "open",
     "created_at": "2026-04-22"
   }

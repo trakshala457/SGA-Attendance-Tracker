@@ -40,8 +40,16 @@ def _load_all() -> list[FollowUpTask]:
     try:
         with open(TASKS_PATH, encoding="utf-8") as f:
             raw = json.load(f)
-        return [FollowUpTask(**t) for t in raw]
-    except (json.JSONDecodeError, TypeError):
+        # Dedupe by task_id (keep the last/most recent entry)
+        by_id: dict[str, FollowUpTask] = {}
+        for t in raw:
+            try:
+                task = FollowUpTask(**t)
+                by_id[task.task_id] = task
+            except TypeError:
+                continue
+        return list(by_id.values())
+    except json.JSONDecodeError:
         return []
 
 

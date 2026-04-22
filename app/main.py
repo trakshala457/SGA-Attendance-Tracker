@@ -240,7 +240,7 @@ def render_follow_ups() -> None:
             cols[1].write(f"📞 {t.parent_email}")
             cols[2].write(f"Due: **{t.due_date}**")
             cols[3].write(f"Attendance: {t.attendance_percent}%")
-            if cols[4].button("Mark done", key=f"done_{t.task_id}"):
+            if cols[4].button("Mark done", key=f"open_done_{t.task_id}"):
                 mark_done(t.task_id)
                 st.rerun()
             st.divider()
