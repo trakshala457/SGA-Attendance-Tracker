@@ -45,11 +45,12 @@ project/
    ```
 5. Run:
    ```bash
+   cd app
    streamlit run app/main.py
    ```
 
 The app starts at `http://localhost:5000` and auto-creates `app/data/students.csv`
-with 5 demo students covering low/medium/high attendance.
+with 200 demo students covering low/medium/high attendance.
 
 ## Email delivery
 
