@@ -24,6 +24,13 @@ from attendance_manager import (
     save_students,
 )
 from email_sender import EmailRecord, send_weekly_email
+from follow_up_manager import (
+    auto_generate_for_students,
+    list_tasks,
+    mark_done,
+    open_count,
+    reopen,
+)
 from gemini_service import generate_email_body
 from utils import current_week_dates, fmt, is_sunday, is_weekday_mon_sat
 
@@ -37,6 +44,12 @@ def _init_session() -> None:
         st.session_state.students = load_students()
     if "email_log" not in st.session_state:
         st.session_state.email_log = []  # list[EmailRecord]
+    if "new_followups" not in st.session_state:
+        st.session_state.new_followups = []
+    # Auto-create follow-ups for any student now below 50%
+    new = auto_generate_for_students(st.session_state.students)
+    if new:
+        st.session_state.new_followups = new
 
 
 def _refresh_students() -> None:
@@ -47,11 +60,21 @@ def render_header() -> None:
     st.title("SGA Attendance Tracker")
     st.caption("GR University - Weekly attendance and AI-generated reports")
     today = date.today()
-    cols = st.columns(3)
+    cols = st.columns(4)
     cols[0].metric("Today", today.strftime("%A, %d %b %Y"))
     cols[1].metric("Students assigned", len(st.session_state.students))
     low = sum(1 for s in st.session_state.students if s.average_attendance() < 75)
-    cols[2].metric("Low-attendance students (<75%)", low)
+    cols[2].metric("Low-attendance (<75%)", low)
+    cols[3].metric("Open follow-ups", open_count())
+
+    if st.session_state.new_followups:
+        names = ", ".join(t.student_name for t in st.session_state.new_followups[:5])
+        more = "" if len(st.session_state.new_followups) <= 5 else f" (+{len(st.session_state.new_followups) - 5} more)"
+        st.warning(
+            f"⏰ {len(st.session_state.new_followups)} new follow-up task(s) auto-created "
+            f"for students below 50%: {names}{more}. See the Follow-ups section."
+        )
+        st.session_state.new_followups = []
 
 
 def render_dashboard() -> None:
@@ -145,6 +168,9 @@ def render_dashboard() -> None:
             mark_today_attendance(students, marking_widgets, today)
             save_students(students)
             _refresh_students()
+            new = auto_generate_for_students(st.session_state.students)
+            if new:
+                st.session_state.new_followups = new
             st.success(f"Saved attendance for {today_key}.")
             st.rerun()
 
@@ -194,6 +220,46 @@ def render_weekly_email_section() -> None:
                 st.text(rec.body)
 
 
+def render_follow_ups() -> None:
+    st.subheader("Follow-up tasks")
+    st.caption(
+        "Auto-created when a student's weekly attendance drops below 50%. "
+        "Each task suggests calling the parent by Friday."
+    )
+
+    tab_open, tab_done = st.tabs([f"Open ({open_count()})", "Completed"])
+
+    with tab_open:
+        open_tasks = list_tasks(status="open")
+        if not open_tasks:
+            st.success("No open follow-ups. Great work.")
+        for t in open_tasks:
+            cols = st.columns([3, 2, 2, 2, 1.4])
+            cols[0].markdown(f"**{t.student_name}** ({t.student_id})")
+            cols[0].caption(t.action)
+            cols[1].write(f"📞 {t.parent_email}")
+            cols[2].write(f"Due: **{t.due_date}**")
+            cols[3].write(f"Attendance: {t.attendance_percent}%")
+            if cols[4].button("Mark done", key=f"done_{t.task_id}"):
+                mark_done(t.task_id)
+                st.rerun()
+            st.divider()
+
+    with tab_done:
+        done_tasks = list_tasks(status="done")
+        if not done_tasks:
+            st.info("No completed tasks yet.")
+        for t in done_tasks[:50]:
+            cols = st.columns([3, 2, 2, 2, 1.4])
+            cols[0].markdown(f"~~{t.student_name}~~ ({t.student_id})")
+            cols[1].write(t.parent_email)
+            cols[2].write(f"Was due: {t.due_date}")
+            cols[3].write(f"{t.attendance_percent}%")
+            if cols[4].button("Reopen", key=f"reopen_{t.task_id}"):
+                reopen(t.task_id)
+                st.rerun()
+
+
 def render_sidebar() -> None:
     with st.sidebar:
         st.header("About")
@@ -220,6 +286,8 @@ def main() -> None:
     render_header()
     st.divider()
     render_dashboard()
+    st.divider()
+    render_follow_ups()
     st.divider()
     render_weekly_email_section()
 
