@@ -7,6 +7,7 @@ Assumptions (per spec):
 - SMTP credentials are placeholders; emails are printed to console by default.
   Full SMTP code is included (commented) in email_sender.py with setup notes.
 """
+
 from __future__ import annotations
 
 from datetime import date
@@ -61,7 +62,7 @@ def render_header() -> None:
     st.caption("GR University - Weekly attendance and AI-generated reports")
     today = date.today()
     cols = st.columns(4)
-    cols[0].metric("Today", today.strftime("%A, %d %b %Y"))
+    cols[0].metric("Today", today.strftime("%d %b %Y"))
     cols[1].metric("Students assigned", len(st.session_state.students))
     low = sum(1 for s in st.session_state.students if s.average_attendance() < 75)
     cols[2].metric("Low-attendance (<75%)", low)
@@ -69,7 +70,11 @@ def render_header() -> None:
 
     if st.session_state.new_followups:
         names = ", ".join(t.student_name for t in st.session_state.new_followups[:5])
-        more = "" if len(st.session_state.new_followups) <= 5 else f" (+{len(st.session_state.new_followups) - 5} more)"
+        more = (
+            ""
+            if len(st.session_state.new_followups) <= 5
+            else f" (+{len(st.session_state.new_followups) - 5} more)"
+        )
         st.warning(
             f"⏰ {len(st.session_state.new_followups)} new follow-up task(s) auto-created "
             f"for students below 50%: {names}{more}. See the Follow-ups section."
@@ -86,7 +91,9 @@ def render_dashboard() -> None:
     st.subheader("Dashboard")
 
     if sunday:
-        st.info("Today is Sunday - no attendance marking. The weekly reports can be sent below.")
+        st.info(
+            "Today is Sunday - no attendance marking. The weekly reports can be sent below."
+        )
     elif not is_weekday_mon_sat(today):
         st.warning("Today is not a weekday (Mon-Sat). Marking is disabled.")
 
@@ -96,7 +103,8 @@ def render_dashboard() -> None:
     page_size = fcols[2].selectbox("Rows per page", [25, 50, 100, 200], index=0)
 
     filtered = [
-        s for s in students
+        s
+        for s in students
         if ((not show_only_low) or s.average_attendance() < 75)
         and (not search or search in s.name.lower() or search in s.student_id.lower())
     ]
@@ -108,10 +116,13 @@ def render_dashboard() -> None:
     total_pages = max(1, (len(filtered) + page_size - 1) // page_size)
     page = st.number_input(
         f"Page (1 - {total_pages}) — showing {len(filtered)} of {len(students)}",
-        min_value=1, max_value=total_pages, value=1, step=1,
+        min_value=1,
+        max_value=total_pages,
+        value=1,
+        step=1,
     )
     start = (page - 1) * page_size
-    visible = filtered[start:start + page_size]
+    visible = filtered[start : start + page_size]
 
     with st.form("attendance_form"):
         rows = []
@@ -131,7 +142,11 @@ def render_dashboard() -> None:
             avg = stats["average"]
             low = avg < 75
             c = st.columns([2, 1.2, 2.5, 2.5, 1.4, 1.5])
-            name_html = f"<span style='color:#b00020;font-weight:600'>⚠ {s.name}</span>" if low else s.name
+            name_html = (
+                f"<span style='color:#b00020;font-weight:600'>⚠ {s.name}</span>"
+                if low
+                else s.name
+            )
             c[0].markdown(name_html, unsafe_allow_html=True)
             c[1].write(s.student_id)
             c[2].write(s.student_email)
@@ -191,7 +206,9 @@ def render_weekly_email_section() -> None:
 
     col1, col2 = st.columns(2)
     auto_label = "Send Weekly Reports (Sunday)"
-    send_auto = col1.button(auto_label, disabled=not sunday, type="primary" if sunday else "secondary")
+    send_auto = col1.button(
+        auto_label, disabled=not sunday, type="primary" if sunday else "secondary"
+    )
     send_test = col2.button("Test Weekly Report (Send Now)")
 
     if send_auto or send_test:
@@ -215,7 +232,9 @@ def render_weekly_email_section() -> None:
     if st.session_state.email_log:
         st.markdown("#### Email log")
         for rec in st.session_state.email_log[:20]:
-            with st.expander(f"{'✅' if rec.delivered else '❌'} {rec.subject}  →  {', '.join(rec.to)}"):
+            with st.expander(
+                f"{'✅' if rec.delivered else '❌'} {rec.subject}  →  {', '.join(rec.to)}"
+            ):
                 st.caption(rec.info)
                 st.text(rec.body)
 
@@ -264,8 +283,7 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.header("About")
         st.write(
-            "Demo app for a single SGA managing 5 students. Attendance is persisted "
-            "to `app/data/students.csv`."
+            "An AI‑first SGA dashboard that automates attendance marking, sends personalized weekly emails , predicts attendance risk, and generates WhatsApp‑ready summaries – all to reduce human effort at scale.."
         )
         st.divider()
         st.subheader("Week")
@@ -274,6 +292,7 @@ def render_sidebar() -> None:
         st.divider()
         if st.button("Reset demo data"):
             from attendance_manager import seed_default_students
+
             seed_default_students()
             _refresh_students()
             st.success("Reseeded demo students.")
