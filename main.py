@@ -8,13 +8,17 @@ Assumptions (per spec):
   Full SMTP code is included (commented) in email_sender.py with setup notes.
 """
 
+
+
 from __future__ import annotations
+
+import os
 
 from datetime import date
 
 import pandas as pd
 import streamlit as st
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 from attendance_manager import (
     ABSENT,
@@ -35,7 +39,34 @@ from follow_up_manager import (
 from gemini_service import generate_email_body
 from utils import current_week_dates, fmt, is_sunday, is_weekday_mon_sat
 
-# load_dotenv()
+load_dotenv()
+
+
+
+def check_login():
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
+
+    if not st.session_state.logged_in:
+        st.title("SGA Login")
+
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Login"):
+            if (
+                username == os.getenv("SGA_USERNAME")
+                and password == os.getenv("SGA_PASSWORD")
+            ):
+                st.session_state.logged_in = True
+                st.success("Login successful")
+                st.rerun()
+            else:
+                st.error("Invalid credentials")
+
+        st.stop()  # 🔥 stops rest of app
+
+check_login()
 
 st.set_page_config(page_title="SGA Attendance Tracker", page_icon="📚", layout="wide")
 
