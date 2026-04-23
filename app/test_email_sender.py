@@ -6,11 +6,11 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-host = os.environ.get("SMTP_HOST")
-port = int(os.environ.get("SMTP_PORT", 587))
-user = os.environ.get("SMTP_USER")
-password = os.environ.get("SMTP_PASSWORD")
-sender = os.environ.get("SMTP_FROM", user)
+host = os.getenv("SMTP_HOST")
+port = int(os.getenv("SMTP_PORT", 587))
+user = os.getenv("SMTP_USER")
+password = os.getenv("SMTP_PASSWORD")
+sender = os.getenv("SMTP_FROM", user)
 
 recipients = ["your_real_email@gmail.com"]  # CHANGE THIS TO YOUR EMAIL
 subject = "Standalone Test"

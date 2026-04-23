@@ -14,7 +14,7 @@ from datetime import date
 
 import pandas as pd
 import streamlit as st
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 from attendance_manager import (
     ABSENT,
@@ -35,7 +35,7 @@ from follow_up_manager import (
 from gemini_service import generate_email_body
 from utils import current_week_dates, fmt, is_sunday, is_weekday_mon_sat
 
-load_dotenv()
+# load_dotenv()
 
 st.set_page_config(page_title="SGA Attendance Tracker", page_icon="📚", layout="wide")
 

@@ -13,7 +13,7 @@ def _configure() -> None:
     global _configured
     if _configured:
         return
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not set in environment.")
     genai.configure(api_key=api_key)

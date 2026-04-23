@@ -3,7 +3,7 @@ text for display in the Streamlit UI). Real SMTP code is included below,
 commented out, with setup instructions.
 
 To enable real SMTP delivery:
-  1. Add to your environment / .env:
+  1. Add to your getenvment / .env:
         SMTP_HOST=smtp.gmail.com
         SMTP_PORT=587
         SMTP_USER=youraddress@gmail.com
@@ -24,7 +24,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-USE_SMTP = os.environ.get("SGA_USE_SMTP", "0") == "1"
+USE_SMTP = os.getenv("SGA_USE_SMTP", "0") == "1"
 
 
 @dataclass
@@ -67,11 +67,11 @@ def _send_via_smtp(recipients: list[str], subject: str, body: str) -> None:
     # raise NotImplementedError(
     #     "SMTP delivery not enabled. Configure env vars and uncomment the body of _send_via_smtp."
     # )
-    host = os.environ["SMTP_HOST"]
-    port = int(os.environ.get("SMTP_PORT", "587"))
-    user = os.environ["SMTP_USER"]
-    password = os.environ["SMTP_PASSWORD"]
-    sender = os.environ.get("SMTP_FROM", user)
+    host = os.getenv["SMTP_HOST"]
+    port = int(os.getenv("SMTP_PORT", "587"))
+    user = os.getenv["SMTP_USER"]
+    password = os.getenv["SMTP_PASSWORD"]
+    sender = os.getenv("SMTP_FROM", user)
     
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
