@@ -50,8 +50,8 @@ def check_login():
     if not st.session_state.logged_in:
         st.title("SGA Login")
 
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
+        username = st.text_input("Username", placeholder="Saritha_SGA")
+        password = st.text_input("Password",placeholder="sarithasga@123", type="password")
 
         if st.button("Login"):
             if (
@@ -327,6 +327,11 @@ def render_sidebar() -> None:
             seed_default_students()
             _refresh_students()
             st.success("Reseeded demo students.")
+            st.rerun()
+
+        st.divider()
+        if st.button("Logout"):
+            st.session_state.logged_in = False
             st.rerun()
 
 
