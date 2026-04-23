@@ -15,15 +15,15 @@ project/
 ├── .env.example
 ├── requirements.txt
 ├── README.md
-└── app/
-    ├── main.py                  # Streamlit UI + session state
-    ├── attendance_manager.py    # CSV persistence + averages
-    ├── gemini_service.py        # Gemini API email body generation
-    ├── email_sender.py          # SMTP / console mock sender
-    ├── utils.py                 # Date helpers
-    ├── .streamlit/config.toml
-    └── data/
-        └── students.csv         # Auto-seeded with 5 demo students
+├── main.py                  # Streamlit UI + session state
+├── attendance_manager.py    # CSV persistence + averages
+├── gemini_service.py        # Gemini API email body generation
+├── email_sender.py          # SMTP / console mock sender
+├── utils.py                 # Date helpers
+├── .streamlit/config.toml
+└── data/
+    └── students.csv         # Auto-seeded with 5 demo students
+    
 ```
 
 ## Setup
@@ -45,8 +45,7 @@ project/
    ```
 5. Run:
    ```bash
-   cd app
-   streamlit run app/main.py
+   streamlit run main.py
    ```
 
 The app starts at `http://localhost:5000` and auto-creates `app/data/students.csv`
